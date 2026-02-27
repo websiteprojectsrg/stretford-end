@@ -247,17 +247,21 @@ export default function Home({ initialArticles }) {
 
   // Separate fan vs live articles
   const fanArticles = articles.filter(a => !a.is_live)
-  const hero = fanArticles[0]
-  const heroRow = fanArticles.slice(1, 5)
-  const newsGrid = fanArticles.slice(0, 4)
-  const compact = fanArticles.slice(4, 10)
+  // Hero always uses live news if available, fallback to fan
+  const heroArticle = liveArticles[0] || fanArticles[0]
+  const heroRow = liveArticles.length >= 4
+    ? liveArticles.slice(1, 5)
+    : [...liveArticles.slice(1), ...fanArticles].slice(0, 4)
+  // Fan content — shown at bottom as ~15% of page (just 1 section)
+  const fanSpotlight = fanArticles.slice(0, 2) // just 2 fan picks at the bottom
+  const compact = fanArticles.slice(2, 8)
   const feature = fanArticles.find(a => a.category === 'Transfers') || fanArticles[2]
   const playerFocus = fanArticles.filter(a => a.category === 'Player Focus')
 
   const loadLiveNews = useCallback(async () => {
     setLiveState('loading')
     try {
-      const res = await fetch('/api/articles?live=true&limit=6')
+      const res = await fetch('/api/articles?live=true&limit=12')
       const data = await res.json()
       setLiveArticles(data.articles || [])
       setLiveState('done')
@@ -349,17 +353,17 @@ export default function Home({ initialArticles }) {
       {/* HOME */}
       {!active && (
         <>
-          {/* HERO */}
-          {hero && (
+          {/* HERO — uses latest live news */}
+          {(liveState === 'done' || fanArticles.length > 0) && heroArticle && (
             <div className="hero-wrap">
               <div className="hero-grid">
-                <div className="hero-main" onClick={() => open(hero)}>
-                  <SafeImg src={hero.image_url} alt={hero.title} imgClass="hmimg" phClass="hmimg" category={hero.category} />
+                <div className="hero-main" onClick={() => open(heroArticle)}>
+                  <SafeImg src={heroArticle.image_url} alt={heroArticle.title} imgClass="hmimg" phClass="hmimg" category={heroArticle.category} />
                   <div className="hm-overlay" />
                   <div className="hm-content">
-                    <span className="cat-badge">{hero.category}</span>
-                    <div className="hm-title">{hero.title}</div>
-                    <div className="hm-meta"><strong>{hero.author}</strong> | {formatDate(hero.created_at)}</div>
+                    <span className="cat-badge">{heroArticle.category}</span>
+                    <div className="hm-title">{heroArticle.title}</div>
+                    <div className="hm-meta"><strong>{heroArticle.author}</strong> | {formatDate(heroArticle.created_at)}</div>
                   </div>
                 </div>
                 <div className="hero-right">
@@ -409,7 +413,7 @@ export default function Home({ initialArticles }) {
 
             {liveState === 'done' && liveArticles.length > 0 && (
               <div className="grid-4">
-                {liveArticles.slice(0, 4).map(s => (
+                {liveArticles.slice(1, 5).map(s => (
                   <div key={s.id} className="g4-card" onClick={() => open(s)}>
                     <SafeImg src={s.image_url} alt={s.title} imgClass="g4-img" phClass="g4-ph" category={s.category} />
                     <div className="g4-cat">{s.category}</div>
@@ -426,58 +430,65 @@ export default function Home({ initialArticles }) {
               </div>
             )}
 
-            {/* FAN NEWS */}
-            <div className="sec-head">
-              <span className="sec-title">From the Terraces</span>
-              <button className="sec-more">See more →</button>
-            </div>
-            <div className="grid-4">
-              {newsGrid.map(s => (
-                <div key={s.id} className="g4-card" onClick={() => open(s)}>
-                  <SafeImg src={s.image_url} alt={s.title} imgClass="g4-img" phClass="g4-ph" category={s.category} />
-                  <div className="g4-cat">{s.category}</div>
-                  <div className="g4-title">{s.title}</div>
-                  <div className="g4-meta"><strong>{s.author}</strong> | {formatDate(s.created_at)}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* TRANSFERS FEATURE */}
-            {feature && (
+            {/* MORE LIVE NEWS — rows 2 and 3 */}
+            {liveState === 'done' && liveArticles.length > 4 && (
               <>
-                <div className="sec-head">
-                  <span className="sec-title">Transfer News</span>
-                  <button className="sec-more">See more →</button>
+                <div className="sec-head" style={{marginTop:8}}>
+                  <span className="sec-title">More News</span>
                 </div>
-                <div className="big-feature" onClick={() => open(feature)}>
-                  <SafeImg src={feature.image_url} alt={feature.title} imgClass="bf-img" phClass="bf-ph" category={feature.category} />
-                  <div className="bf-body">
-                    <div className="bf-cat">{feature.category}</div>
-                    <div className="bf-title">{feature.title}</div>
-                    <div className="bf-excerpt">{feature.excerpt}</div>
-                    <div className="bf-meta"><strong>{feature.author}</strong> | {formatDate(feature.created_at)}</div>
-                  </div>
+                <div className="grid-4">
+                  {liveArticles.slice(4, 8).map(s => (
+                    <div key={s.id} className="g4-card" onClick={() => open(s)}>
+                      <SafeImg src={s.image_url} alt={s.title} imgClass="g4-img" phClass="g4-ph" category={s.category} />
+                      <div className="g4-cat">{s.category}</div>
+                      <div className="g4-title">{s.title}</div>
+                      <div className="reporter-label">Staff Reporter · {formatDate(s.created_at)}</div>
+                    </div>
+                  ))}
                 </div>
               </>
             )}
 
-            {/* MORE STORIES */}
-            <div className="sec-head">
-              <span className="sec-title">More Stories</span>
-              <button className="sec-more">See more →</button>
-            </div>
-            <div className="compact">
-              {compact.map(s => (
-                <div key={s.id} className="cl-item" onClick={() => open(s)}>
-                  <SafeImg src={s.image_url} alt={s.title} imgClass="cl-img" phClass="cl-ph" category={s.category} />
-                  <div>
-                    <div className="cl-cat">{s.category}</div>
-                    <div className="cl-title">{s.title}</div>
-                    <div className="cl-meta"><strong>{s.author}</strong> | {formatDate(s.created_at)}</div>
-                  </div>
+            {/* MORE STORIES — live compact list */}
+            {liveState === 'done' && liveArticles.length > 8 && (
+              <>
+                <div className="sec-head">
+                  <span className="sec-title">Also Today</span>
                 </div>
-              ))}
-            </div>
+                <div className="compact">
+                  {liveArticles.slice(8, 14).map(s => (
+                    <div key={s.id} className="cl-item" onClick={() => open(s)}>
+                      <SafeImg src={s.image_url} alt={s.title} imgClass="cl-img" phClass="cl-ph" category={s.category} />
+                      <div>
+                        <div className="cl-cat">{s.category}</div>
+                        <div className="cl-title">{s.title}</div>
+                        <div className="cl-meta">Staff Reporter | {formatDate(s.created_at)}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* ── FAN CONTENT (~15%) — divider to signal change of tone ── */}
+            {fanArticles.length > 0 && (
+              <div style={{borderTop:'3px solid var(--border)', margin:'32px 0 24px', paddingTop:24}}>
+                <div className="sec-head sec-head-red">
+                  <span className="sec-title">From the Terraces</span>
+                  <span style={{fontSize:11,color:'var(--muted)',fontWeight:600,fontStyle:'italic'}}>Fan Opinion &amp; Analysis</span>
+                </div>
+                <div className="grid-4">
+                  {fanSpotlight.map(s => (
+                    <div key={s.id} className="g4-card" onClick={() => open(s)}>
+                      <SafeImg src={s.image_url} alt={s.title} imgClass="g4-img" phClass="g4-ph" category={s.category} />
+                      <div className="g4-cat">{s.category}</div>
+                      <div className="g4-title">{s.title}</div>
+                      <div className="g4-meta"><strong>{s.author}</strong> | {formatDate(s.created_at)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* PLAYER FOCUS */}
             {playerFocus.length > 0 && (
@@ -487,7 +498,7 @@ export default function Home({ initialArticles }) {
                   <button className="sec-more">See more →</button>
                 </div>
                 <div className="grid-4">
-                  {playerFocus.map(s => (
+                  {playerFocus.slice(0,4).map(s => (
                     <div key={s.id} className="g4-card" onClick={() => open(s)}>
                       <SafeImg src={s.image_url} alt={s.title} imgClass="g4-img" phClass="g4-ph" category={s.category} />
                       <div className="g4-cat">{s.category}</div>
