@@ -182,9 +182,31 @@ button { cursor: pointer; font-family: var(--sans); }
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 
-function SafeImg({ src, alt, imgClass, phClass, phIcon = '⚽' }) {
+const CAT_COLOURS = {
+  'Match Report': '#c8102e', 'Transfer News': '#1a472a', 'Transfers': '#1a472a',
+  'Club News': '#0a0e1a', 'Injury Update': '#b85c00', 'Premier League': '#3d0099',
+  'Opinion': '#444', 'Player Focus': '#8b0000', 'Finance': '#1a3a5c',
+  'Preview': '#004494', 'Analysis': '#333'
+}
+
+// v2 - SafeImg with category-coloured placeholders
+function SafeImg({ src, alt, imgClass, phClass, category = '' }) {
   const [err, setErr] = useState(false)
-  if (!src || err) return <div className={phClass}>{phIcon}</div>
+  const bg = CAT_COLOURS[category] || '#0a0e1a'
+
+  if (!src || err) {
+    return (
+      <div className={phClass} style={{
+        background: bg, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', gap: 6,
+        color: 'rgba(255,255,255,0.55)', fontSize: 11,
+        fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em'
+      }}>
+        <span style={{ fontSize: 26 }}>⚽</span>
+        <span>{category || 'Man Utd'}</span>
+      </div>
+    )
+  }
   return <img src={src} alt={alt} className={imgClass} onError={() => setErr(true)} />
 }
 
@@ -332,7 +354,7 @@ export default function Home({ initialArticles }) {
             <div className="hero-wrap">
               <div className="hero-grid">
                 <div className="hero-main" onClick={() => open(hero)}>
-                  <SafeImg src={hero.image_url} alt={hero.title} imgClass="hmimg" phClass="hmimg" phIcon="⚽" />
+                  <SafeImg src={hero.image_url} alt={hero.title} imgClass="hmimg" phClass="hmimg" category={hero.category} />
                   <div className="hm-overlay" />
                   <div className="hm-content">
                     <span className="cat-badge">{hero.category}</span>
@@ -343,7 +365,7 @@ export default function Home({ initialArticles }) {
                 <div className="hero-right">
                   {heroRow.map(s => (
                     <div key={s.id} className="hr-card" onClick={() => open(s)}>
-                      <SafeImg src={s.image_url} alt={s.title} imgClass="hr-img" phClass="hr-ph" phIcon="⚽" />
+                      <SafeImg src={s.image_url} alt={s.title} imgClass="hr-img" phClass="hr-ph" category={s.category} />
                       <div className="hr-body">
                         <div className="hr-cat">{s.category}</div>
                         <div className="hr-title">{s.title}</div>
@@ -389,7 +411,7 @@ export default function Home({ initialArticles }) {
               <div className="grid-4">
                 {liveArticles.slice(0, 4).map(s => (
                   <div key={s.id} className="g4-card" onClick={() => open(s)}>
-                    <div className="g4-ph">📰</div>
+                    <SafeImg src={s.image_url} alt={s.title} imgClass="g4-img" phClass="g4-ph" category={s.category} />
                     <div className="g4-cat">{s.category}</div>
                     <div className="g4-title">{s.title}</div>
                     <div className="reporter-label">Staff Reporter · {formatDate(s.created_at)}</div>
@@ -412,7 +434,7 @@ export default function Home({ initialArticles }) {
             <div className="grid-4">
               {newsGrid.map(s => (
                 <div key={s.id} className="g4-card" onClick={() => open(s)}>
-                  <SafeImg src={s.image_url} alt={s.title} imgClass="g4-img" phClass="g4-ph" />
+                  <SafeImg src={s.image_url} alt={s.title} imgClass="g4-img" phClass="g4-ph" category={s.category} />
                   <div className="g4-cat">{s.category}</div>
                   <div className="g4-title">{s.title}</div>
                   <div className="g4-meta"><strong>{s.author}</strong> | {formatDate(s.created_at)}</div>
@@ -428,7 +450,7 @@ export default function Home({ initialArticles }) {
                   <button className="sec-more">See more →</button>
                 </div>
                 <div className="big-feature" onClick={() => open(feature)}>
-                  <SafeImg src={feature.image_url} alt={feature.title} imgClass="bf-img" phClass="bf-ph" />
+                  <SafeImg src={feature.image_url} alt={feature.title} imgClass="bf-img" phClass="bf-ph" category={feature.category} />
                   <div className="bf-body">
                     <div className="bf-cat">{feature.category}</div>
                     <div className="bf-title">{feature.title}</div>
@@ -447,7 +469,7 @@ export default function Home({ initialArticles }) {
             <div className="compact">
               {compact.map(s => (
                 <div key={s.id} className="cl-item" onClick={() => open(s)}>
-                  <SafeImg src={s.image_url} alt={s.title} imgClass="cl-img" phClass="cl-ph" phIcon="⚽" />
+                  <SafeImg src={s.image_url} alt={s.title} imgClass="cl-img" phClass="cl-ph" category={s.category} />
                   <div>
                     <div className="cl-cat">{s.category}</div>
                     <div className="cl-title">{s.title}</div>
@@ -467,7 +489,7 @@ export default function Home({ initialArticles }) {
                 <div className="grid-4">
                   {playerFocus.map(s => (
                     <div key={s.id} className="g4-card" onClick={() => open(s)}>
-                      <SafeImg src={s.image_url} alt={s.title} imgClass="g4-img" phClass="g4-ph" />
+                      <SafeImg src={s.image_url} alt={s.title} imgClass="g4-img" phClass="g4-ph" category={s.category} />
                       <div className="g4-cat">{s.category}</div>
                       <div className="g4-title">{s.title}</div>
                       <div className="g4-meta"><strong>{s.author}</strong> | {formatDate(s.created_at)}</div>
