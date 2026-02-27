@@ -16,84 +16,193 @@ export default async function handler(req, res) {
   }
 }
 
-async function fetchOgImageUrl(pageUrl) {
-  if (!pageUrl) return null
+// Step 1: Extract og:image URL from source article page
+async function fetchOgImage(url) {
+  if (!url) return null
   try {
-    const res = await fetch(pageUrl, {
+    const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)', 'Accept': 'text/html' },
       signal: AbortSignal.timeout(6000)
     })
     if (!res.ok) return null
     const html = await res.text()
-    const m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+    const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
-      || html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i)
+    if (ogMatch?.[1]) return ogMatch[1]
+    const twMatch = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i)
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i)
-    return m?.[1] || null
-  } catch (e) { return null }
+    if (twMatch?.[1]) return twMatch[1]
+    return null
+  } catch (e) {
+    console.warn('[scrape] og:image failed for', url?.slice(0, 50), e.message)
+    return null
+  }
 }
 
-async function downloadAndStoreImage(imageUrl, supabase) {
+// Step 2: Download image and upload to Supabase Storage
+async function uploadToStorage(imageUrl, filename) {
   if (!imageUrl) return null
   try {
-    const res = await fetch(imageUrl, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)', 'Referer': 'https://www.google.com/', 'Accept': 'image/webp,image/apng,image/*,*/*' },
+    // Download the image
+    const imgRes = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)',
+        'Referer': 'https://www.google.com/',
+        'Accept': 'image/webp,image/apng,image/*,*/*'
+      },
       signal: AbortSignal.timeout(8000)
     })
-    if (!res.ok) return null
-    const contentType = res.headers.get('content-type') || 'image/jpeg'
-    if (!contentType.startsWith('image/')) return null
-    const buffer = await res.arrayBuffer()
-    if (buffer.byteLength < 5000) return null
-    const ext = contentType.includes('png') ? 'png' : contentType.includes('webp') ? 'webp' : 'jpg'
-    const filename = `articles/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const { error } = await supabase.storage.from('article-images').upload(filename, buffer, { contentType, cacheControl: '31536000', upsert: false })
-    if (error) { console.warn('[scrape] Upload failed:', error.message); return null }
-    const { data: { publicUrl } } = supabase.storage.from('article-images').getPublicUrl(filename)
-    return publicUrl
-  } catch (e) { console.warn('[scrape] Store failed:', e.message); return null }
+    if (!imgRes.ok) {
+      console.warn('[scrape] Image download failed:', imgRes.status, imageUrl.slice(0, 60))
+      return null
+    }
+
+    const contentType = imgRes.headers.get('content-type') || 'image/jpeg'
+    if (!contentType.startsWith('image/')) {
+      console.warn('[scrape] Not an image:', contentType)
+      return null
+    }
+
+    const buffer = await imgRes.arrayBuffer()
+    if (buffer.byteLength < 1000) {
+      console.warn('[scrape] Image too small, likely blocked')
+      return null
+    }
+
+    // Upload to Supabase Storage
+    const supabase = getServiceClient()
+    const ext = contentType.includes('png') ? 'png' : contentType.includes('gif') ? 'gif' : contentType.includes('webp') ? 'webp' : 'jpg'
+    const path = `articles/${filename}.${ext}`
+
+    const { error } = await supabase.storage
+      .from('article-images')
+      .upload(path, buffer, {
+        contentType,
+        upsert: true
+      })
+
+    if (error) {
+      console.warn('[scrape] Storage upload failed:', error.message)
+      return null
+    }
+
+    // Get public URL
+    const { data } = supabase.storage.from('article-images').getPublicUrl(path)
+    console.log('[scrape] Uploaded to storage:', path)
+    return data.publicUrl
+
+  } catch (e) {
+    console.warn('[scrape] Upload failed:', e.message)
+    return null
+  }
 }
 
 const FALLBACK = {
-  'Match Report':'https://images.unsplash.com/photo-1522778526097-ce0a22ceb253?w=800&q=80',
-  'Transfer News':'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&q=80',
-  'Transfers':'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&q=80',
-  'Club News':'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
-  'Injury Update':'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80',
-  'Premier League':'https://images.unsplash.com/photo-1551958219-acbc595bc558?w=800&q=80',
-  'Opinion':'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=800&q=80',
-  'Player Focus':'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=800&q=80',
-  'Finance':'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
-  'Analysis':'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
+  'Match Report':   'https://images.unsplash.com/photo-1522778526097-ce0a22ceb253?w=800&q=80',
+  'Transfer News':  'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&q=80',
+  'Transfers':      'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&q=80',
+  'Club News':      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
+  'Injury Update':  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80',
+  'Premier League': 'https://images.unsplash.com/photo-1551958219-acbc595bc558?w=800&q=80',
+  'Opinion':        'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=800&q=80',
+  'Player Focus':   'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=800&q=80',
+  'Finance':        'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
+  'Analysis':       'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
+}
+
+// Player-specific images — if a player is mentioned in the title, use their photo
+const PLAYER_IMAGES = [
+  { keywords: ['sesko','sésko'],        url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4755.jpeg' },
+  { keywords: ['mbeumo'],               url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4772.jpeg' },
+  { keywords: ['amad'],                 url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4521.jpeg' },
+  { keywords: ['mainoo'],               url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4792.jpeg' },
+  { keywords: ['lammens'],              url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4783.jpeg' },
+  { keywords: ['maguire'],              url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4168.jpeg' },
+  { keywords: ['martinez','martínez'],  url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4542.jpeg' },
+  { keywords: ['ugarte'],               url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-circle-frame-2.jpg' },
+  { keywords: ['cunha'],                url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4189.jpeg' },
+  { keywords: ['yoro'],                 url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-13.jpg' },
+  { keywords: ['dalot'],                url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-13.jpg' },
+  { keywords: ['dorgu'],                url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4633.jpeg' },
+  { keywords: ['mazraoui'],             url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-13.jpg' },
+  { keywords: ['fernandes'],            url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/man-utd-ratcliffe-wilcox.jpg' },
+  { keywords: ['zirkzee'],              url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4359.jpeg' },
+  { keywords: ['carrick'],              url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/michael-carrick-man-united.jpg' },
+  { keywords: ['de ligt','de-ligt'],    url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4523.jpeg' },
+]
+
+function getPlayerImage(title, tags) {
+  const text = [title, ...(tags || [])].join(' ').toLowerCase()
+  for (const p of PLAYER_IMAGES) {
+    if (p.keywords.some(k => text.includes(k))) return p.url
+  }
+  return null
 }
 
 async function fetchAndRewriteNews() {
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-  const prompt = `Search the web for the 6 most recent Manchester United news stories from today (${today}). Write each as a neutral journalist article. Return ONLY a JSON array, no markdown fences, exactly 6 objects each with: "title" (max 12 words), "excerpt" (1-2 sentences), "body" (3 paragraphs separated by \\n\\n), "category" (one of: "Transfer News","Match Report","Club News","Injury Update","Premier League","Opinion"), "tags" (2-4 strings), "source_url" (real URL of the original article)`
+  const prompt = `Search the web for the 6 most recent Manchester United news stories from today (${today}).
+Write each as a neutral journalist article. Return ONLY a JSON array, no markdown fences, exactly 6 objects each with:
+- "title": headline max 12 words
+- "excerpt": 1-2 sentences max 35 words
+- "body": 3 paragraphs separated by \\n\\n, factual only
+- "category": one of: "Transfer News","Match Report","Club News","Injury Update","Premier League","Opinion"
+- "tags": 2-4 strings
+- "source_url": the real URL of the original article you found this story from`
+
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, tools: [{ type: 'web_search_20250305', name: 'web_search' }], messages: [{ role: 'user', content: prompt }] })
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4000,
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      messages: [{ role: 'user', content: prompt }]
+    })
   })
-  if (!response.ok) throw new Error(`Anthropic API ${response.status}`)
+  if (!response.ok) throw new Error(`Anthropic API ${response.status}: ${await response.text().then(t => t.slice(0, 200))}`)
   const data = await response.json()
   const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('')
-  if (!text) throw new Error('No text')
+  if (!text) throw new Error('No text in response')
   const clean = text.replace(/```json|```/gi, '').trim()
-  const s = clean.indexOf('['), e = clean.lastIndexOf(']')
-  if (s === -1) throw new Error('No JSON array')
-  return JSON.parse(clean.slice(s, e + 1))
+  const start = clean.indexOf('['), end = clean.lastIndexOf(']')
+  if (start === -1 || end === -1) throw new Error('No JSON array found')
+  const parsed = JSON.parse(clean.slice(start, end + 1))
+  if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('Empty array')
+  console.log(`[scrape] Got ${parsed.length} articles`)
+  return parsed
 }
 
 async function saveArticles(articles) {
   const supabase = getServiceClient()
-  console.log('[scrape] Fetching and storing images...')
-  const imageUrls = await Promise.all(articles.map(async (a) => {
-    const ogUrl = await fetchOgImageUrl(a.source_url)
-    if (!ogUrl) return FALLBACK[a.category] || FALLBACK['Match Report']
-    const stored = await downloadAndStoreImage(ogUrl, supabase)
-    return stored || FALLBACK[a.category] || FALLBACK['Match Report']
+
+  // For each article: try og:image first, then player-specific image, then category fallback
+  console.log('[scrape] Processing images...')
+  const imageUrls = await Promise.all(articles.map(async (a, i) => {
+    // 1. Try og:image from source URL and upload to our storage
+    const ogUrl = await fetchOgImage(a.source_url)
+    if (ogUrl) {
+      const filename = `article-${Date.now()}-${i}`
+      const stored = await uploadToStorage(ogUrl, filename)
+      if (stored) {
+        console.log(`[scrape] Article ${i + 1}: uploaded og:image ✓`)
+        return stored
+      }
+      // og:image URL exists but upload failed — use the direct URL as fallback
+      console.log(`[scrape] Article ${i + 1}: upload failed, using direct og:image URL`)
+      return ogUrl
+    }
+    // 2. Try player-specific image based on title/tags
+    const playerImg = getPlayerImage(a.title, a.tags)
+    if (playerImg) {
+      console.log(`[scrape] Article ${i + 1}: using player image ✓`)
+      return playerImg
+    }
+    // 3. Category fallback
+    console.log(`[scrape] Article ${i + 1}: using category fallback`)
+    return FALLBACK[a.category] || FALLBACK['Match Report']
   }))
+
   const rows = articles.map((a, i) => ({
     title: String(a.title || '').slice(0, 255),
     excerpt: String(a.excerpt || '').slice(0, 500),
@@ -105,6 +214,7 @@ async function saveArticles(articles) {
     tags: Array.isArray(a.tags) ? a.tags.slice(0, 10) : [],
     published: true
   }))
+
   const { data, error } = await supabase.from('articles').insert(rows).select('id')
   if (error) throw new Error('Insert failed: ' + error.message)
   return data?.length || 0
