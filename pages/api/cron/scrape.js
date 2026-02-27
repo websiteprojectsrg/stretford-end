@@ -103,7 +103,7 @@ const FALLBACK = {
   'Transfers':      'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&q=80',
   'Club News':      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
   'Injury Update':  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80',
-  'Premier League': 'https://images.unsplash.com/photo-1551958219-acbc595bc558?w=800&q=80',
+  'Premier League': 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=800&q=80',
   'Opinion':        'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=800&q=80',
   'Player Focus':   'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=800&q=80',
   'Finance':        'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
@@ -127,6 +127,7 @@ const PLAYER_IMAGES = [
   { keywords: ['mazraoui'],             url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-13.jpg' },
   { keywords: ['fernandes'],            url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/man-utd-ratcliffe-wilcox.jpg' },
   { keywords: ['zirkzee'],              url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4359.jpeg' },
+  { keywords: ['mount'],                url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4459.jpeg' },
   { keywords: ['carrick'],              url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/michael-carrick-man-united.jpg' },
   { keywords: ['de ligt','de-ligt'],    url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4523.jpeg' },
 ]
