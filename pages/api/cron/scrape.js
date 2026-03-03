@@ -98,16 +98,17 @@ async function uploadToStorage(imageUrl, filename) {
 }
 
 const FALLBACK = {
-  'Match Report':   'https://images.unsplash.com/photo-1522778526097-ce0a22ceb253?w=800&q=80',
-  'Transfer News':  'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&q=80',
-  'Transfers':      'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&q=80',
-  'Club News':      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
-  'Injury Update':  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80',
-  'Premier League': 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=800&q=80',
-  'Opinion':        'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=800&q=80',
-  'Player Focus':   'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=800&q=80',
-  'Finance':        'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
-  'Analysis':       'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
+  'Match Report':   'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4755.jpeg',
+  'Transfer News':  'https://icdn.strettynews.com/wp-content/uploads/2026/02/man-utd-ratcliffe-wilcox.jpg',
+  'Transfers':      'https://icdn.strettynews.com/wp-content/uploads/2026/02/man-utd-ratcliffe-wilcox.jpg',
+  'Club News':      'https://icdn.strettynews.com/wp-content/uploads/2026/01/amorim-carrick-man-utd.jpg',
+  'Injury Update':  'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4459.jpeg',
+  'Premier League': 'https://icdn.strettynews.com/wp-content/uploads/2026/02/michael-carrick-man-united.jpg',
+  'Opinion':        'https://icdn.strettynews.com/wp-content/uploads/2026/02/michael-carrick-man-united.jpg',
+  'Player Focus':   'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4772.jpeg',
+  'Finance':        'https://icdn.strettynews.com/wp-content/uploads/2026/02/man-utd-ratcliffe-wilcox.jpg',
+  'Analysis':       'https://icdn.strettynews.com/wp-content/uploads/2026/01/amorim-carrick-man-utd.jpg',
+  'Preview':        'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4292.jpeg',
 }
 
 // Player-specific images — if a player is mentioned in the title, use their photo

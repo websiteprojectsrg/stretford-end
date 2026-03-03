@@ -289,12 +289,16 @@ export default function Home({ initialArticles }) {
   const [liveState, setLiveState] = useState('idle')
 
   const fan = articles.filter(a => !a.is_live)
-  const hero = fan[0]
-  const sideCards = fan.slice(1, 5)
   const gridTop = fan.slice(0, 4)
   const featureArticle = fan.find(a => a.category === 'Opinion') || fan[2]
   const compactItems = fan.slice(4, 10)
   const playerCards = fan.filter(a => a.category === 'Player Focus')
+  // Hero: always the latest live article once loaded, fallback to top fan article
+  const hero = (liveState === 'done' && liveArticles.length > 0) ? liveArticles[0] : fan[0]
+  // Sidebar: mix of remaining live + fan articles
+  const sideCards = liveState === 'done' && liveArticles.length > 1
+    ? [...liveArticles.slice(1, 3), ...fan.slice(0, 2)].slice(0, 4)
+    : fan.slice(1, 5)
 
   const loadLive = useCallback(async () => {
     setLiveState('loading')

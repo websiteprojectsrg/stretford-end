@@ -41,7 +41,7 @@ const articles = [
     body: "Cast your mind back to early January. We were 14th. Amorim was gone. Half the fanbase wanted to just write the season off. I'll be honest — I was nearly in that camp.\n\nThen Michael Carrick walked in. Quiet. Composed. No press conference theatrics, no grand tactical manifesto. Just rolled up his sleeves and got to work. Seven games later — six wins, one draw — we're third. Three points above Chelsea, three above Liverpool. Champions League football, which felt like a pipe dream six weeks ago, is now firmly in our own hands.\n\nWhat's he done differently? The pressing has purpose. Casemiro has been transformed. Bruno is on another level. Mainoo growing every game. And Sesko — well, we've written enough about Sesko this week. Newcastle away Wednesday. Villa at home on the 15th. Don't stop us now.",
     category: 'Opinion',
     author: 'Gaz Neville (not that one)',
-    image_url: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
+    image_url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/amorim-carrick-man-utd.jpg',
     tags: ['Carrick', 'Premier League', 'Top Four', 'Opinion'],
   },
   {
@@ -50,7 +50,7 @@ const articles = [
     body: "I've been to Newcastle away twice in my life. Once in 2012 — we won 3-0, Rooney hat-trick, coach home felt like floating. Once in 2019 — we lost 1-0 and I cried quietly on the A69. That's football.\n\nWednesday night (20:15 kick-off — set your alarms) we go back. Third versus mid-table on paper, but St James' on a floodlit Wednesday is never just mid-table energy. That ground generates noise like nowhere else in England, and our twenty thousand in the away end will match them decibel for decibel.\n\nSesko should start again. His aerial ability against Schar and Burn is a genuine weapon. Mbeumo wide right, Cunha causing chaos on the left. A win Wednesday and we're consolidating third before the Villa test on the 15th. Come on you Reds.",
     category: 'Preview',
     author: 'Sinéad McGrath',
-    image_url: 'https://images.unsplash.com/photo-1522778526097-ce0a22ceb253?w=800&q=80',
+    image_url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4292.jpeg',
     tags: ['Newcastle', 'Preview', 'Premier League', 'Away Days'],
   },
   {
@@ -104,7 +104,7 @@ const articles = [
     body: "I've been thinking about Ruben Amorim a lot recently. Not with anger — the fury has faded. More with a sad curiosity about how something that looked so promising on paper went so catastrophically wrong on the pitch.\n\nThe tactical system was never the only problem. The 3-4-3 with wing-backs works — it works at Sporting, it works elsewhere. The problem was the squad. United had neither the wing-backs to make it function, nor the pressing intensity required for the high defensive line. Amorim said this himself — 'we don't have the players for this yet.'\n\nWhat Carrick has done differently is meet the players where they are. The system serves the squad, not the other way around. That's management. The lesson for this summer: hire someone with vision, absolutely. But hire someone who can adapt. Tactical purity is worthless if the dressing room is lost.",
     category: 'Opinion',
     author: 'Gaz Neville (not that one)',
-    image_url: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
+    image_url: 'https://icdn.strettynews.com/wp-content/uploads/2025/09/Zoomed-in-39.jpg',
     tags: ['Amorim', 'Opinion', 'Carrick', 'Analysis'],
   },
   {
@@ -113,7 +113,7 @@ const articles = [
     body: "I've been going to Old Trafford for 22 years. Home and away, league and cups, good times and very, very bad. I was there for the 4-4 against Bournemouth in December when the atmosphere was somewhere between a wake and a protest. I was there for the Tottenham win in February when it felt like a completely different stadium.\n\nWhat's changed? It's easy to say 'results' and leave it there. But that's not quite it — we've had good runs before without this feeling. There's something about Carrick specifically that the Stretford End has responded to. He's one of ours. When the crowd sings his name, you can see it genuinely moves him. That connection is rare and it's real.\n\nThe team is playing for him. You can see it in how they sprint back, how they press, how they celebrate together. There's a collective will that was absent for most of the last three years. Right now, in March 2026, it feels like more than a glimpse. It feels like something that might last.",
     category: 'Opinion',
     author: 'Sinéad McGrath',
-    image_url: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=800&q=80',
+    image_url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/michael-carrick-man-united.jpg',
     tags: ['Old Trafford', 'Fans', 'Opinion', 'Carrick'],
   },
 ]
