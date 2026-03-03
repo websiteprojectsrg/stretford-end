@@ -289,16 +289,32 @@ export default function Home({ initialArticles }) {
   const [liveState, setLiveState] = useState('idle')
 
   const fan = articles.filter(a => !a.is_live)
-  const gridTop = fan.slice(0, 4)
-  const featureArticle = fan.find(a => a.category === 'Opinion') || fan[2]
-  const compactItems = fan.slice(4, 10)
-  const playerCards = fan.filter(a => a.category === 'Player Focus')
+
+  // Nav tab filtering
+  const NAV_CATEGORY = {
+    'News': null, // show all
+    'Match Reports': 'Match Report',
+    'Transfers': 'Transfer News',
+    'Player Focus': 'Player Focus',
+    'Opinion': 'Opinion',
+  }
+  const filteredFan = navTab === 'Home' || navTab === 'News'
+    ? fan
+    : fan.filter(a => a.category === NAV_CATEGORY[navTab])
+  const filteredLive = navTab === 'Home' || navTab === 'News'
+    ? liveArticles
+    : liveArticles.filter(a => a.category === NAV_CATEGORY[navTab])
+
+  const gridTop = filteredFan.slice(0, 4)
+  const featureArticle = filteredFan.find(a => a.category === 'Opinion') || filteredFan[2]
+  const compactItems = filteredFan.slice(4, 10)
+  const playerCards = filteredFan.filter(a => a.category === 'Player Focus')
   // Hero: always the latest live article once loaded, fallback to top fan article
-  const hero = (liveState === 'done' && liveArticles.length > 0) ? liveArticles[0] : fan[0]
+  const hero = (liveState === 'done' && filteredLive.length > 0) ? filteredLive[0] : filteredFan[0]
   // Sidebar: mix of remaining live + fan articles
-  const sideCards = liveState === 'done' && liveArticles.length > 1
-    ? [...liveArticles.slice(1, 3), ...fan.slice(0, 2)].slice(0, 4)
-    : fan.slice(1, 5)
+  const sideCards = liveState === 'done' && filteredLive.length > 1
+    ? [...filteredLive.slice(1, 3), ...filteredFan.slice(0, 2)].slice(0, 4)
+    : filteredFan.slice(1, 5)
 
   const loadLive = useCallback(async () => {
     setLiveState('loading')
@@ -361,7 +377,7 @@ export default function Home({ initialArticles }) {
           <div className="nav-links">
             {['Home','News','Match Reports','Transfers','Player Focus','Opinion'].map(n => (
               <button key={n} className={navTab === n ? 'active' : ''}
-                onClick={() => { setNavTab(n); if (n === 'Home') goHome() }}>{n}</button>
+                onClick={() => { setActive(null); setNavTab(n); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>{n}</button>
             ))}
           </div>
           <div className="nav-right">
@@ -465,9 +481,9 @@ export default function Home({ initialArticles }) {
                 ))}
               </div>
             )}
-            {liveState === 'done' && liveArticles.length > 0 && (
+            {liveState === 'done' && filteredLive.length > 0 && (
               <div className="live-grid">
-                {liveArticles.slice(0,3).map(s => (
+                {filteredLive.slice(0,3).map(s => (
                   <div key={s.id} className="live-card" onClick={() => open(s)}>
                     {s.image_url
                       ? <img src={s.image_url} alt={s.title} className="lc-img" onError={e => e.currentTarget.style.display='none'} />
@@ -481,7 +497,7 @@ export default function Home({ initialArticles }) {
                 ))}
               </div>
             )}
-            {liveState === 'done' && liveArticles.length === 0 && (
+            {liveState === 'done' && filteredLive.length === 0 && (
               <p style={{color:'rgba(255,255,255,.35)',fontSize:13,textAlign:'center',padding:'12px 0'}}>
                 No live articles yet — scraper runs every 2 hours.{' '}
                 <button onClick={loadLive} style={{color:'var(--gold)',background:'none',border:'none',fontWeight:700,cursor:'pointer',fontSize:13}}>Trigger now</button>
