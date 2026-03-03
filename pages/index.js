@@ -404,42 +404,8 @@ export default function Home({ initialArticles }) {
       {/* HOME */}
       {!active && (<>
 
-        {/* HERO */}
-        {hero && (
-          <div className="hero-wrap">
-            <div className="hero-grid">
-              <div className="hero-main" onClick={() => open(hero)}>
-                {hero.image_url
-                  ? <img src={hero.image_url} alt={hero.title} className="hm-img"
-                      onError={e => e.currentTarget.src='https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80'} />
-                  : <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80" alt="" className="hm-img" />}
-                <div className="hm-content">
-                  <span className="hm-kicker">{hero.category}</span>
-                  <div className="hm-title">{hero.title}</div>
-                  <div className="hm-excerpt">{hero.excerpt}</div>
-                  <div className="hm-meta"><strong>{hero.author}</strong> · {fmt(hero.created_at)}</div>
-                </div>
-              </div>
-              <div className="hero-sidebar">
-                {sideCards.map(s => (
-                  <div key={s.id} className="hs-card" onClick={() => open(s)}>
-                    {s.image_url
-                      ? <img src={s.image_url} alt={s.title} className="hs-img" onError={e => e.currentTarget.style.display='none'} />
-                      : <div className="hs-ph">⚽</div>}
-                    <div className="hs-body">
-                      <div className="hs-kicker">{s.category}</div>
-                      <div className="hs-title">{s.title}</div>
-                      <div className="hs-meta">{s.author} · {fmt(s.created_at)}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* LIVE NEWS */}
-        <div className="section-wrap">
+        {/* LIVE NEWS - always first */}
+        <div className="section-wrap" style={{marginTop:20}}>
           <div className="live-wrap">
             <div className="live-head">
               <span className="live-label">Latest News</span>
@@ -485,6 +451,43 @@ export default function Home({ initialArticles }) {
               </p>
             )}
           </div>
+        </div>
+
+        {/* HERO */}
+        {hero && (
+          <div className="hero-wrap">
+            <div className="hero-grid">
+              <div className="hero-main" onClick={() => open(hero)}>
+                {hero.image_url
+                  ? <img src={hero.image_url} alt={hero.title} className="hm-img"
+                      onError={e => e.currentTarget.src='https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80'} />
+                  : <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80" alt="" className="hm-img" />}
+                <div className="hm-content">
+                  <span className="hm-kicker">{hero.category}</span>
+                  <div className="hm-title">{hero.title}</div>
+                  <div className="hm-excerpt">{hero.excerpt}</div>
+                  <div className="hm-meta"><strong>{hero.author}</strong> · {fmt(hero.created_at)}</div>
+                </div>
+              </div>
+              <div className="hero-sidebar">
+                {sideCards.map(s => (
+                  <div key={s.id} className="hs-card" onClick={() => open(s)}>
+                    {s.image_url
+                      ? <img src={s.image_url} alt={s.title} className="hs-img" onError={e => e.currentTarget.style.display='none'} />
+                      : <div className="hs-ph">⚽</div>}
+                    <div className="hs-body">
+                      <div className="hs-kicker">{s.category}</div>
+                      <div className="hs-title">{s.title}</div>
+                      <div className="hs-meta">{s.author} · {fmt(s.created_at)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="section-wrap">
 
           {/* FROM THE TERRACES */}
           <div className="sec-head-left">
