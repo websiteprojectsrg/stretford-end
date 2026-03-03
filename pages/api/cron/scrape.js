@@ -111,29 +111,50 @@ const FALLBACK = {
   'Preview':        'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4292.jpeg',
 }
 
-// Player-specific images — if a player is mentioned in the title, use their photo
+// Player/topic images — matched against title AND tags
+// Every entry is a real photo of a person — no grass, no balls, no stock images
 const PLAYER_IMAGES = [
-  { keywords: ['sesko','sésko'],        url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4755.jpeg' },
-  { keywords: ['mbeumo'],               url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4772.jpeg' },
-  { keywords: ['amad'],                 url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4521.jpeg' },
-  { keywords: ['mainoo'],               url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4792.jpeg' },
-  { keywords: ['lammens'],              url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4783.jpeg' },
-  { keywords: ['maguire'],              url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4168.jpeg' },
-  { keywords: ['martinez','martínez'],  url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4542.jpeg' },
-  { keywords: ['ugarte'],               url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-circle-frame-2.jpg' },
-  { keywords: ['cunha'],                url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4189.jpeg' },
-  { keywords: ['yoro'],                 url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-13.jpg' },
-  { keywords: ['dalot'],                url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-13.jpg' },
-  { keywords: ['dorgu'],                url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4633.jpeg' },
-  { keywords: ['mazraoui'],             url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-13.jpg' },
-  { keywords: ['fernandes'],            url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/man-utd-ratcliffe-wilcox.jpg' },
-  { keywords: ['zirkzee'],              url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4359.jpeg' },
-  { keywords: ['mount'],                url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4459.jpeg' },
-  { keywords: ['carrick'],              url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/michael-carrick-man-united.jpg' },
-  { keywords: ['de ligt','de-ligt'],    url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4523.jpeg' },
+  // Players
+  { keywords: ['sesko','sésko','šeško'],          url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4755.jpeg' },
+  { keywords: ['mbeumo'],                          url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4772.jpeg' },
+  { keywords: ['amad','diallo'],                   url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4521.jpeg' },
+  { keywords: ['mainoo','kobbie'],                 url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4792.jpeg' },
+  { keywords: ['lammens','senne'],                 url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4783.jpeg' },
+  { keywords: ['maguire','harry'],                 url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4168.jpeg' },
+  { keywords: ['martinez','martínez','lisandro'],  url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4542.jpeg' },
+  { keywords: ['ugarte','manuel'],                 url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-circle-frame-2.jpg' },
+  { keywords: ['cunha','matheus'],                 url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4189.jpeg' },
+  { keywords: ['yoro','leny'],                     url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-13.jpg' },
+  { keywords: ['dalot','diogo'],                   url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-13.jpg' },
+  { keywords: ['dorgu','patrick'],                 url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4633.jpeg' },
+  { keywords: ['mazraoui','noussair'],             url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/Zoomed-in-13.jpg' },
+  { keywords: ['fernandes','bruno'],               url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4772.jpeg' },
+  { keywords: ['zirkzee','joshua'],                url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4359.jpeg' },
+  { keywords: ['mount','mason'],                   url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4459.jpeg' },
+  { keywords: ['de ligt','de-ligt','matthijs'],    url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4523.jpeg' },
+  { keywords: ['casemiro'],                        url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4792.jpeg' },
+  { keywords: ['rashford','marcus'],               url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4359.jpeg' },
+  { keywords: ['shaw','luke'],                     url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4542.jpeg' },
+  // Managers
+  { keywords: ['carrick','michael'],               url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/michael-carrick-man-united.jpg' },
+  { keywords: ['amorim','ruben','rúben'],           url: 'https://icdn.strettynews.com/wp-content/uploads/2025/09/Zoomed-in-39.jpg' },
+  // Topics — still real United photos, just more general
+  { keywords: ['transfer','signing','bid','fee','target','deal','window'], url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/man-utd-ratcliffe-wilcox.jpg' },
+  { keywords: ['profit','revenue','financial','finance','accounts'],       url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/man-utd-ratcliffe-wilcox.jpg' },
+  { keywords: ['newcastle','st james',"st. james"],                        url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4292.jpeg' },
+  { keywords: ['palace','crystal'],                                        url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4755.jpeg' },
+  { keywords: ['villa','aston'],                                           url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4792.jpeg' },
+  { keywords: ['arsenal','emirates'],                                      url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/IMG_4292.jpeg' },
+  { keywords: ['liverpool','anfield'],                                     url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4755.jpeg' },
+  { keywords: ['city','etihad','derby'],                                   url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4792.jpeg' },
+  { keywords: ['stretford','old trafford','terraces','fans','atmosphere'], url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/michael-carrick-man-united.jpg' },
+  { keywords: ['injury','injured','fitness','return','setback','surgery'], url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/IMG_4459.jpeg' },
+  { keywords: ['permanent','manager','job','appointment','contract'],      url: 'https://icdn.strettynews.com/wp-content/uploads/2026/01/amorim-carrick-man-utd.jpg' },
+  { keywords: ['third','table','top four','champions league','unbeaten'],  url: 'https://icdn.strettynews.com/wp-content/uploads/2026/02/michael-carrick-man-united.jpg' },
 ]
 
 function getPlayerImage(title, tags) {
+  // Search both title and tags
   const text = [title, ...(tags || [])].join(' ').toLowerCase()
   for (const p of PLAYER_IMAGES) {
     if (p.keywords.some(k => text.includes(k))) return p.url
@@ -148,8 +169,8 @@ Write each as a neutral journalist article. Return ONLY a JSON array, no markdow
 - "title": headline max 12 words
 - "excerpt": 1-2 sentences max 35 words
 - "body": 3 paragraphs separated by \\n\\n, factual only
-- "category": one of: "Transfer News","Match Report","Club News","Injury Update","Premier League","Opinion"
-- "tags": 2-4 strings
+- "category": one of: "Transfer News","Match Report","Club News","Injury Update","Premier League","Opinion","Preview","Player Focus","Analysis"
+- "tags": array of 3-5 strings. IMPORTANT: always include the full surname of any player or manager mentioned (e.g. "Sesko", "Carrick", "Mainoo", "Fernandes", "Maguire", "Cunha", "Mbeumo", "Amorim"). These are used for image matching.
 - "source_url": the real URL of the original article you found this story from`
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {

@@ -615,7 +615,7 @@ export async function getServerSideProps() {
   try {
     const { data, error } = await supabase
       .from('articles')
-      .select('id, title, excerpt, category, author, is_live, image_url, tags, created_at')
+      .select('id, title, excerpt, body, category, author, is_live, image_url, tags, created_at')
       .eq('published', true)
       .eq('is_live', false)
       .order('created_at', { ascending: false })
